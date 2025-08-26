@@ -25,9 +25,39 @@ json_data = response.json()
 
 #JSONの中身を確認
 pprint.pprint(json_data)
+latitude = json_data['results'][0]['geometry']['location']['lat']
+longitude = json_data['results'][0]['geometry']['location']['lng']
 
-#取得したデータの緯度経度を表示
-for item in json_data['']
+# APIエンドポイントURLを指定する
+url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json'
 
+# APIにGETリクエストを送信し、結果を取得する
+response = requests.get(
+    url,
+    params={
+      'location': f'{latitude},{longitude}',
+      'language': 'ja',
+      'radius': 500,
+      'type': 'restaurant',
+      'key': api_key
+    }
+)
 
+# レスポンスのJSONデータを格納する
+data = response.json()
 
+# レストランの情報を抽出する
+restaurants = []
+for place in data['results']:
+    restaurant = {
+        'name': place['name'],
+        'rating': place.get('rating', 'N/A'),
+        'address': place.get('vicinity', 'N/A'),
+        'types': place.get('types', []),
+        'place_id': place['place_id']
+    }
+    restaurants.append(restaurant)
+
+# レストランの情報を表示する
+for restaurant in restaurants:
+    print(restaurant['name'], restaurant['rating'], restaurant['address'])

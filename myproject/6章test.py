@@ -35,4 +35,3 @@ for item in json_data['items']:
     video_title = item['snippet']['title']
     video_url = f'https://www.youtube.com/watch?v={item["id"]["videoId"]}'
     print(f'{video_title}:{video_url}')
-    
