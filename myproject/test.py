@@ -13,19 +13,39 @@ chrome_options.add_argument('--no-sandbox')
 chrome_options.add_argument('--disable-dev-shm-usage')
 
 # Chromeを立ち上げる
-chrome_driver = webdriver.Chrome(options=chrome_options)
+chrome_driver = webdriver.Chrome('C:/chromedriver.exe')
 
 # TERAKOYAのトップページにアクセス
 chrome_driver.get('https://terakoya.sejuku.net/register')
 
 # 最大30秒間、ログインボタンが表示されるのを待つ
-wait = WebDriverWait(chrome_driver, 60)
-header_login_button = wait.until(
-    EC.visibility_of_element_located(
-        (By.CSS_SELECTOR, 
-         '#root > header > div.sc-jgyNOb.eGDJQH')
-    )
-)
+wait = WebDriverWait(chrome_driver, 30)
+header_login_button = wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, "#root > header > div.sc-bhVsRh.hZBqIC")))
 
 # ログインボタンをクリックする
 header_login_button.click()
+
+# メールアドレスとパスワードを入力する
+email_address = input('メールアドレスを入力してください: ')
+password = getpass('パスワードを入力してください: ')
+
+# メールアドレスとパスワードの入力欄を見つける
+parent_element = chrome_driver.find_element(By.CSS_SELECTOR, '.sc-pyfCe.lduieC')
+email_input = parent_element.find_element(By.NAME, 'email')
+password_input = parent_element.find_element(By.NAME, 'password')
+
+# メールアドレスとパスワードを設定
+email_input.send_keys(email_address)
+password_input.send_keys(password)
+
+# ログインボタンをクリックしてログイン
+form_login_button = wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, "#root > div.sc-kNOymR.TvzZn > div.sc-lgpSej.gsAReM > div.sc-dntSTA.dQOsDP > button")))
+form_login_button.click()
+
+# ログイン後、要素が読み込まれるまで待つ
+wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, 'nav > img ')))
+
+# スクリーンショットを撮る
+chrome_driver.save_screenshot('screenshot.png')
+
+chrome_driver.quit()

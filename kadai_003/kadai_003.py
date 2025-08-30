@@ -5,7 +5,7 @@ from selenium.webdriver.common.by import By
 from getpass import getpass
 import time
 
-#　ヘッドレスも＾ドで起動するためのオプションを設定
+#　ヘッドレスモードで起動するためのオプションを設定
 chrome_options = webdriver.ChromeOptions()
 chrome_options.add_argument('--headless')
 chrome_options.add_argument('--no-sandbox')
@@ -17,7 +17,6 @@ chrome_driver = webdriver.Chrome(options=chrome_options)
 #　TERAKOYAのトップページにアクセス
 chrome_driver.get('https://terakoya.sejuku.net/register')
 
-
 # 最大30秒間、ログインボタンが表示されるのを待つ
 wait = WebDriverWait(chrome_driver, 30)
 header_login_button = wait.until(
@@ -25,7 +24,6 @@ header_login_button = wait.until(
         (By.CSS_SELECTOR, "#root > header > div.sc-bhVsRh.hZBqIC")
         )
     )
-
 
 #　ログインボタンをクリックする
 header_login_button.click()
@@ -38,6 +36,7 @@ password = getpass('パスワードを入力してください：')
 parnet_element = chrome_driver.find_element(By.CSS_SELECTOR, '.sc-kNOymR.TvzZn') 
 email_input = parnet_element.find_element(By.NAME, 'email')
 password_input = parnet_element.find_element(By.NAME, 'password')
+
 
 #　メールアドレスとパスワードを設定
 email_input.send_keys(email_addres)
@@ -57,8 +56,44 @@ form_login_button.click()
 wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, '.sc-gwPKJL.bTdclZ')))
 time.sleep(5)
 
-# スクリーンショットを撮る
-chrome_driver.save_screenshot('screenshot.png')
+# TERAKOYAのアカウント設定ページにアクセス
+chrome_driver.get('https://terakoya.sejuku.net/account/profile')
+
+# 最大30秒間 プロフィール画面が表示されるのを待つ
+wait = WebDriverWait(chrome_driver, 30)
+header_edit_button = wait.until(
+    EC.visibility_of_element_located(
+        (By.CSS_SELECTOR,
+         "#root > div.sc-BvjM.dayVoP > div > div > main > div > div.sc-lfIzcI.gdQipL > button")
+    )
+)
+
+# 編集ボタンをクリック
+header_edit_button.click()
+
+# 最大30秒間　自己紹介要素が表示されるまで待つ
+wait = WebDriverWait(chrome_driver, 30)
+input_box = wait.until(
+    EC.visibility_of_element_located(
+        (By.CSS_SELECTOR,
+         "#root > div.sc-BvjM.dayVoP > div > div > main > div > div.sc-lfIzcI.gdQipL > div:nth-child(10) > div.sc-CqUPI.bZqAix > textarea")
+    )
+)
+
+# 自己紹介欄に文字を入力する
+input_box.send_keys("プログラミング学習中です！今はスクレイピングに挑戦しています！")
+
+# 最大30秒間　更新ボタンが表示されるまで待つ
+wait = WebDriverWait(chrome_driver, 30)
+update_button = wait.until(
+    EC.visibility_of_element_located(
+        (By.CSS_SELECTOR,
+         "#root > div.sc-BvjM.dayVoP > div > div > main > div > div.sc-lfIzcI.gdQipL > button.sc-dTvVRJ.bHRgJQ.sc-hZdRFE.fLGwDp")
+    )
+)
+
+# 更新ボタンをクリック
+update_button.click()
 
 # Chromeを閉じる
 chrome_driver.quit()
