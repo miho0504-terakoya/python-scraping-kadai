@@ -3,6 +3,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from getpass import getpass
+from bs4 import BeautifulSoup
 import time
 
 #　ヘッドレスも＾ドで起動するためのオプションを設定
@@ -31,19 +32,17 @@ header_login_button = wait.until(
 header_login_button.click()
 
 #　メールアドレスとパスワードを入力する
-email_addres = input('メールアドレスを入力してください：')
+email_address = input('メールアドレスを入力してください：')
 password = getpass('パスワードを入力してください：')
 
-#　メールアドレスとパスワードの入力ラナンを見つける
-parnet_element = chrome_driver.find_element(By.CSS_SELECTOR, '.sc-kNOymR.TvzZn') 
-email_input = parnet_element.find_element(By.NAME, 'email')
-password_input = parnet_element.find_element(By.NAME, 'password')
+# メールアドレスとパスワードの入力欄を見つける
+arnet_element = chrome_driver.find_element(By.CSS_SELECTOR, '.sc-kNOymR.TvzZn') 
+email_input = chrome_driver.find_element(By.NAME, 'email')
+password_input = chrome_driver.find_element(By.NAME, 'password')
 
-#　メールアドレスとパスワードを設定
-email_input.send_keys(email_addres)
+# メールアドレスとパスワードを設定
+email_input.send_keys(email_address)
 password_input.send_keys(password)
-
-
 
 # ログインボタンをクリックしてログイン
 form_login_button = wait.until(EC.visibility_of_element_located(
@@ -52,13 +51,40 @@ form_login_button = wait.until(EC.visibility_of_element_located(
                                )
 form_login_button.click()
 
+
 # ログイン後、要素が読み込まれるまで待つ
-# wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, 'nav > img ')))
-wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, '.sc-gwPKJL.bTdclZ')))
+
+timeline_button = wait.until(
+    EC.visibility_of_element_located(
+        (By.CSS_SELECTOR, 'li[data-e2e="navi-timeline"] a')
+    )
+)
 time.sleep(5)
 
-# スクリーンショットを撮る
-chrome_driver.save_screenshot('screenshot.png')
+timeline_button.click()
 
-# Chromeを閉じる
+# ログイン後、最新の投稿が表示されるまで待つ
+
+wait.until(
+    EC.visibility_of_element_located(
+        (By.CSS_SELECTOR, 'a[data-e2e="study_reports"]')
+    )
+)
+
+# ページのHTMLをBeautifulSoupで解析する
+
+soup = BeautifulSoup(chrome_driver.page_source, 'html.parser')
+
+# 最新の投稿を取得
+
+latest_post = soup.find('a', {'data-e2e': 'study_reports'})
+
+# 最新投稿の href を表示
+
+
+print('Latest post href:')
+print('https://terakoya.sejuku.net' + latest_post['href'])
+
+# ブラウザを閉じる
+
 chrome_driver.quit()
